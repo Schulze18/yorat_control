@@ -1,23 +1,36 @@
 <launch>
 
+  <node pkg="tf" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0 /map /world 100"/>
 
   <rosparam file="$(find yorat_control)/config/yorat_diff_drive.yaml" command="load" />
 
 
-  <include file="$(find yorat_description)/launch/yorat_empty_world.launch" />
+  <!--include file="$(find yorat_description)/launch/yorat_urdf_empty_world.launch" /-->
 
+  <include file="$(find yorat_description)/launch/yorat_xacro_empty_world.launch" />
+
+  <!--param name="robot_description" command="$(find xacro)/xacro.py $(find yorat_description)/urdf/yorat.urdf.xacro" /-->
 
   <!-- Spawn a robot into Gazebo -->
-  <node name="spawn_yorat_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param yorat_description -model my_yorat"/>
+  <!--node name="spawn_yorat_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param yorat_description -model my_yorat"/-->
 
   <node name="yorat_controller_manager" pkg="controller_manager" type="spawner"
     respawn="false" output="screen" args="mobile_base_controller" />
 
 
   <!-- convert joint states to TF transforms for rviz, etc -->
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
-    respawn="false" output="screen">
-    <remap from="/joint_states" to="/yorat/joint_states" />
+  <!--node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+    respawn="false" output="screen"-->
+   <!--node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="false" output="screen"-->
+    <!--param name="use_gui" value="TRUE"/-->
+    <!--remap from="/joint_states" to="/yorat/joint_states" /-->
+  <!--/node-->
+
+   <!-- send fake joint values -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
   </node>
+
+  <!-- Combine joint values -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
 
 </launch>
